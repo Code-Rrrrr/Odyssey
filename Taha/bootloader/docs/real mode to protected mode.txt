@@ -1,0 +1,82 @@
+
+how to switch from 16 bit real mode to 32 bit protected mode
+	
+	- cpu starts in 16 bit real mode
+	
+	- disable interrupts
+	
+	- enable the A20 line
+			in original 8086 memory addresses are wrapped at 1MB
+			to access memory beyond 1MB A20 line must be enabled
+			protected mode requires access beyond 1MB
+	
+	- create a global descriptor table (GDT)
+			GDT defines memory segments in protected mode
+			
+	- place the GDT at known memory location
+	
+	- load a cpu register that points to GDT
+	
+	- enable protected mode bit in cpu control register
+			cpu has a special control register (CR0)
+			CR0 is a 32 bit register 
+			set PE (protection enable) bit (bit 0) in CR0 register
+			now CPU enters protected mode
+			
+	- perform a far control transfer / far jump
+			it flushes intruction pipeline (because CPU still executes old prefetch queue instructions from real mode)
+			it loads new code segment selector from
+			it forces cpu into protected mode execution context
+			it activates protected mode properly
+			
+	- prepare segments registers (CS, DS, ES, SS)
+			in real mode segment registers hold segment values
+			in protected mode they become selectors (indexes into GDT)
+			plan which selector will point to which segment (code, data, etc.)
+	
+			
+	- point stack register to a protected mode memory region	
+
+
+---------------------------------------------------
+
+cpu starts in 16 bit real mode
+enable A20 line
+setup GDT (global descriptor table)
+load GDT
+enter 32 bit protected mode
+enable PAE
+setup page tables
+load CR3
+enable long mode
+enable paging
+far jump to 64 bit mode
+
+
+=================================================
+
+GDT = [ Descriptor 0, Descriptor 1, Descriptor 2, ... ]
+
+each descriptor is 8 bytes (64 bits) long
+
+a single descriptor describes one memory segment
+
+each 8 bytes is arranged like this
+
+	Bits:
+	  0-15    : Segment Limit (low part)
+	  16-31   : Base Address (low part)
+	  32-39   : Base Address (middle part)
+	  40-47   : Access byte
+	  48-51   : Segment Limit (high part)
+	  52-55   : Flags
+	  56-63   : Base Address (high part)
+	  
+base address - starting address of memory segment
+limit - size of segment
+access byte - tells it is code or data, read write execute permission, kernel or user level 
+
+
+
+
+

@@ -1,0 +1,7 @@
+i am making a 16 bit operating system for x86_64 architecture as a learning project .
+
+tell me how to make bootloader .
+
+use nasm .
+
+separate bootloader as stage 1 and stage 2 bootloader .

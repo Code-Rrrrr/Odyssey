@@ -1,0 +1,3 @@
+nasm -f bin -l home.lst home.asm -o home.bin
+
+qemu-system-x86_64 -m 16M -drive format=raw,file=home.bin
