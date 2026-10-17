@@ -58,6 +58,9 @@ void syscall_init(void)
      * FMASK:
      *
      * Clear IF (Interrupt Flag) when entering the kernel.
+     * 
+     * prevents any maskable hardware interrupt from interrupting the 
+     * CPU as it enters the the syscall handler.
      */
     wrmsr(IA32_FMASK, (1ULL << 9));
 

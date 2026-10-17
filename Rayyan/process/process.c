@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "process.h"
 /*
     here we have defined a kernel stack top,
     which would be used by the syscall_entry.S to execute the functions of the stack.
@@ -20,5 +21,5 @@ uint64_t user_rflags;
 void process_int(void)
 {
     kernel_stack_top = 
-        &kernel_stack[KERNEL_STACK_SIZE];
+        (uint64_t)&kernel_stack[KERNEL_STACK_SIZE];
 }

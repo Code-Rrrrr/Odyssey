@@ -1,13 +1,14 @@
 long getpid(void){
 
-    long ret;// store the value that kernel returns.
+    long result;// store the value that kernel returns.
+    //that is the actual process id.
 
     asm volatile(
         "syscall"
-        :(=a)(ret)
+        :(=a)(result)
         :(a)(SYS_GETPID)
         :"rcx", "r11", "memory"
     );
 
-    return ret;
+    return result;
 }
