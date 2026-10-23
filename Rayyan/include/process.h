@@ -34,6 +34,7 @@ extern uint64_t kernel_stack_top;
 extern uint64_t user_stack_pointer;
 extern uint64_t user_rip;
 extern uint64_t user_rflags;
+extern unit64_t process_alloc_pid(void);
 
 void process_init(void);
 
