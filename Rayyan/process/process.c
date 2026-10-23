@@ -11,15 +11,103 @@
 uint8_t kernel_stack[KERNEL_STACK_SIZE];
 uint64_t kernel_stack_top;
 
-uint64_t user_stack_pointer;// to store the user stack, to return to in sysret.
+// variables to make a process allocator 
+// right now the allocator works incremently
+// later this would be incorporated with reusing the pids
+//and synchronization.
+static uint64_t current_pid = 1;
+static uint64_t next_pid = 2;
+
+
+// to store the user stack, to return to in sysret.
+uint64_t user_stack_pointer;
 
 //save RCX and R11 properly, because those are the two registers 
 // that SYSCALL itself overwrites and SYSRETQ needs to return to user space
 uint64_t user_rip;
 uint64_t user_rflags;
 
+// the below array is for the process table, right
+// now the array is of fixed size
+
+# define MAX_PROCESS 64
+static process_t process_table[MAX_PROCESS];
+
 void process_int(void)
 {
+
+    // initialize the process table
+    for(int i = 0; i < MAX_PROCESS; i++){
+        process_table[i].pid = 0;
+        process_table[i].state = PROCESS_TERMINIATED;
+    }
+
+    // slot 0 is reserved for kernel process
+    process_table[1].pid = 1;
+    process_table[1].state = PROCESS_RUNNING;
+
+
+
+    current_pid = 1;
+    next_pid = 2;
+
     kernel_stack_top = 
         (uint64_t)&kernel_stack[KERNEL_STACK_SIZE];
 }
+
+uint64_t process_alloc_pid(void){
+    if(next_pid == 0){
+        return 0; // signifies the range has
+        // exhausted
+    }
+    return next_pid++;
+}
+
+process_t *process_find(uint64_t pid){
+    if(pid == 0)
+    return 0;
+
+    for(int i = 0; i < MAX_PROCESS; i++){
+        if(process_table[i].pid == pid)
+        return &process_table[i];
+    }
+    return 0;
+}
+
+// insert a new process in the process table 
+// and mark it as ready
+int process_register(uint64_t pid)
+{
+    if (pid == 0 || process_find(pid) != 0)
+        return -1;
+
+    for (int i = 0; i < MAX_PROCESSES; i++)
+    {
+        if (process_table[i].pid == 0)
+        {
+            process_table[i].pid = pid;
+            process_table[i].state = PROCESS_READY;
+            return 0;
+        }
+    }
+
+    return -1;
+}
+
+// creat the process
+int process_create(void)
+{
+    uint64_t pid = process_alloc_pid();
+
+    if (pid == 0)
+        return -1;
+
+    if (process_register(pid) != 0)
+        return -1;
+
+    return (int)pid;
+}
+
+
+
+
