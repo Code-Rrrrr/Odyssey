@@ -29,7 +29,7 @@ void process_init(void);
 
 #define KERNEL_STACK_SIZE 4096
 
-extern void process_init(void);
+int process_init(void);
 extern uint8_t kernel_stack[KERNEL_STACK_SIZE];
 extern uint64_t kernel_stack_top;
 extern uint64_t user_stack_pointer;
@@ -38,6 +38,9 @@ extern uint64_t user_rflags;
 extern uint64_t process_alloc_pid(void);
 process_t *process_find(uint64_t pid);// declaration for finding a process
 int process_register(uint64_t pid);// register the process
+typedef void(*process_entry_t)(void);// entry-point function pointer to the PCB 
+
+
 
 // now we are implementing the pcb
 typedef enum{
@@ -50,12 +53,10 @@ typedef enum{
 typedef struct process{
     uint64_t pid;
     process_state_t state;
+    uint64_t *stack_pointer;
+    process_entry_t entry;// this variable 
+    // holds the 
 } process_t;
-
-
-
-
-
 
 struct syscall_frame {
     uint64_t r15;

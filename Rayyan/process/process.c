@@ -99,15 +99,52 @@ int process_create(void)
 {
     uint64_t pid = process_alloc_pid();
 
-    if (pid == 0)
+    if (pid == 0 || 
+        process_register(pid) != 0)
         return -1;
 
-    if (process_register(pid) != 0)
+    process_t *process = process_find(pid);
+
+    if (process == 0)
         return -1;
+
+    process->stack_pointer = stack_alloc();
+
+    if (process->stack_pointer == 0)
+    {
+        process->pid = 0;
+        process->state = PROCESS_TERMINATED;
+        return -1;
+    }
 
     return (int)pid;
 }
 
+
+// putting in the scheduler logic
+// this performs the round-robic selection
+// it searches forward from the last selected 
+// slot and returns the next READY process. It
+//  reserves slot 0 for the kernel process, as
+//   in our earlier design.
+process_t *process_schedule_next(void)
+{
+    static int last_used_index = 0;
+
+    for (int i = 1; i <= MAX_PROCESSES; i++)
+    {
+        int index = (last_used_index + i) % MAX_PROCESSES;
+
+        if (process_table[index].pid != 0 &&
+            process_table[index].state == PROCESS_READY)
+        {
+            last_used_index = index;
+            return &process_table[index];
+        }
+    }
+
+    return 0;
+}
 
 
 
