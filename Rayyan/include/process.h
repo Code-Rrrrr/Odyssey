@@ -24,22 +24,8 @@ extern uint64_t user_stack_pointer;
 extern uint64_t user_rip;
 extern uint64_t user_rflags;
 
-void process_init(void);
+
 */
-
-#define KERNEL_STACK_SIZE 4096
-
-int process_init(void);
-extern uint8_t kernel_stack[KERNEL_STACK_SIZE];
-extern uint64_t kernel_stack_top;
-extern uint64_t user_stack_pointer;
-extern uint64_t user_rip;
-extern uint64_t user_rflags;
-extern uint64_t process_alloc_pid(void);
-process_t *process_find(uint64_t pid);// declaration for finding a process
-int process_register(uint64_t pid);// register the process
-typedef void(*process_entry_t)(void);// entry-point function pointer to the PCB 
-
 
 
 // now we are implementing the pcb
@@ -57,6 +43,22 @@ typedef struct process{
     process_entry_t entry;// this variable 
     // holds the 
 } process_t;
+
+
+void process_init(void);
+
+#define KERNEL_STACK_SIZE 4096
+
+extern uint8_t kernel_stack[KERNEL_STACK_SIZE];
+extern uint64_t kernel_stack_top;
+extern uint64_t user_stack_pointer;
+extern uint64_t user_rip;
+extern uint64_t user_rflags;
+extern uint64_t process_alloc_pid(void);
+process_t *process_find(uint64_t pid);// declaration for finding a process
+int process_register(uint64_t pid);// register the process
+typedef void(*process_entry_t)(void);// entry-point function pointer to the PCB 
+
 
 struct syscall_frame {
     uint64_t r15;
