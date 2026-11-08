@@ -7,5 +7,8 @@ void kernel_main(void)
     process_init();
     syscall_init();
 
+    context_init();
+    stack_init();
     // Continue kernel initialization here.
+    
 }
